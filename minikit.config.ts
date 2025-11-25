@@ -27,13 +27,13 @@ export const minikitConfig = {
     primaryCategory: "social",
     tags: ["marketing", "ads", "quickstart", "waitlist"],
     heroImageUrl: `${ROOT_URL}/blue-hero.png`, 
-    tagline: "",
-    ogTitle: "",
-    ogDescription: "",
+    tagline: "Your AI Ad Companion - Smart Marketing Made Simple",
+    ogTitle: "Cubey - Your AI Ad Companion",
+    ogDescription: "Transform your marketing with Cubey, the AI-powered advertising companion that makes creating and managing ads effortless.",
     ogImageUrl: `${ROOT_URL}/blue-hero.png`,
   },
-"baseBuilder": {
-     "ownerAddress":  "0x2a5D0b4035353b98b34A3a2E52B4DdAEB7a41B5c"
+  baseBuilder: {
+     ownerAddress:  "0x2a5D0b4035353b98b34A3a2E52B4DdAEB7a41B5c"
   }
 } as const;
 
