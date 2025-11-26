@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useBalance, useChainId } from 'wagmi';
 import {
   AppBar,
   Toolbar,
@@ -22,6 +22,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import NetworkCheckIcon from '@mui/icons-material/NetworkCheck';
 
 const Navbar = () => {
   const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null);
@@ -31,10 +33,35 @@ const Navbar = () => {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
+  const { data: balance } = useBalance({
+    address: address,
+  });
+  const chainId = useChainId();
+
+  const getNetworkName = () => {
+    switch (chainId) {
+      case 84532:
+        return 'Base Sepolia';
+      case 8453:
+        return 'Base';
+      case 1:
+        return 'Ethereum';
+      case 11155111:
+        return 'Sepolia';
+      default:
+        return `Chain ${chainId}`;
+    }
+  };
 
   const formatAddress = (address: string) => {
     if (!address) return '';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const formatBalance = () => {
+    if (!balance) return '0.00';
+    const value = parseFloat(balance.formatted);
+    return value.toFixed(4);
   };
 
   const handleCopyAddress = () => {
@@ -138,6 +165,31 @@ const Navbar = () => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               >
+                <Box sx={{ px: 2, py: 1.5, minWidth: 220 }}>
+                  <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+                    Network
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <NetworkCheckIcon fontSize="small" color="success" />
+                    <Chip
+                      label={getNetworkName()}
+                      size="small"
+                      color="success"
+                      variant="outlined"
+                    />
+                  </Box>
+                  
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    Account Balance
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                    <AccountBalanceIcon fontSize="small" color="primary" />
+                    <Typography variant="body1" fontWeight="bold">
+                      {formatBalance()} {balance?.symbol || 'ETH'}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Divider />
                 <MenuItem onClick={handleCopyAddress}>
                   <ListItemIcon>
                     <ContentCopyIcon fontSize="small" />

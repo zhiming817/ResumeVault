@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode } from "react";
-import { base } from "wagmi/chains";
+import { baseSepolia } from "wagmi/chains";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
@@ -13,7 +13,7 @@ import "@coinbase/onchainkit/styles.css";
 const queryClient = new QueryClient();
 
 const wagmiConfig = createConfig({
-  chains: [base],
+  chains: [baseSepolia],
   connectors: [
     coinbaseWallet({
       appName: 'ResumeVault',
@@ -21,7 +21,7 @@ const wagmiConfig = createConfig({
     }),
   ],
   transports: {
-    [base.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
 
@@ -45,7 +45,7 @@ export function RootProvider({ children }: { children: ReactNode }) {
           <CssBaseline />
           <OnchainKitProvider
             apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-            chain={base}
+            chain={baseSepolia}
             config={{
               appearance: {
                 mode: "auto",
