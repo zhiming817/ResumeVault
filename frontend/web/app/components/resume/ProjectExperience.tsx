@@ -1,6 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  Card,
+  CardContent,
+  Link,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import FolderIcon from '@mui/icons-material/Folder';
 import { ProjectExperience as ProjectExperienceType } from '@/app/lib/types/resume.types';
 import DatePicker from '../shared/DatePicker';
 
@@ -47,199 +64,204 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">项目经历</h2>
-        <button
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h5" fontWeight="bold">
+          项目经历
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
+          sx={{ textTransform: 'none' }}
         >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
           添加
-        </button>
-      </div>
+        </Button>
+      </Box>
 
       {/* Project Experience List */}
       {data.map((project, index) => (
-        <div key={index} className="mb-4 p-6 border-2 border-gray-200 rounded-lg bg-gray-50">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">{project.name}</h3>
-              <p className="text-sm text-gray-600">
-                {project.role} | {project.startDate} - {project.current ? '至今' : project.endDate}
-              </p>
-              {project.link && (
-                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
-                  {project.link}
-                </a>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <button className="text-teal-600 hover:text-teal-700">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => handleDelete(index)}
-                className="text-red-600 hover:text-red-700"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div className="text-sm text-gray-700 mb-2">
-            <strong>项目描述：</strong>
-            <div className="whitespace-pre-line">{project.description}</div>
-          </div>
-          {project.achievements && (
-            <div className="text-sm text-gray-700">
-              <strong>项目成果：</strong>
-              <div className="whitespace-pre-line">{project.achievements}</div>
-            </div>
-          )}
-        </div>
+        <Card key={index} sx={{ mb: 2, bgcolor: 'grey.50' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
+              <Box>
+                <Typography variant="h6" fontWeight="bold">
+                  {project.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {project.role} | {project.startDate} - {project.current ? '至今' : project.endDate}
+                </Typography>
+                {project.link && (
+                  <Link href={project.link} target="_blank" rel="noopener noreferrer" variant="body2">
+                    {project.link}
+                  </Link>
+                )}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton size="small" color="primary">
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton size="small" color="error" onClick={() => handleDelete(index)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" fontWeight="medium" gutterBottom>
+                项目描述：
+              </Typography>
+              <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                {project.description}
+              </Typography>
+            </Box>
+            {project.achievements && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" fontWeight="medium" gutterBottom>
+                  项目成果：
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                  {project.achievements}
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
       ))}
 
       {/* Add/Edit Form */}
       {isAdding && (
-        <div className="border-2 border-teal-300 rounded-lg p-6 bg-teal-50">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">编辑项目经历</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                项目名称
-              </label>
-              <input
-                type="text"
+        <Card sx={{ border: 2, borderColor: 'primary.main', bgcolor: 'primary.50' }}>
+          <CardContent>
+            <Typography variant="h6" fontWeight="bold" mb={2}>
+              编辑项目经历
+            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
+              <TextField
+                label="项目名称"
                 value={currentProject.name}
                 onChange={(e) => setCurrentProject({ ...currentProject, name: e.target.value })}
-                placeholder=""
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black"
+                fullWidth
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                项目角色
-              </label>
-              <input
-                type="text"
+              <TextField
+                label="项目角色"
                 value={currentProject.role}
                 onChange={(e) => setCurrentProject({ ...currentProject, role: e.target.value })}
                 placeholder="全栈开发工程师"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black"
+                fullWidth
               />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                项目链接（选填）
-              </label>
-              <input
-                type="url"
-                value={currentProject.link}
-                onChange={(e) => setCurrentProject({ ...currentProject, link: e.target.value })}
-                placeholder="例：github.com/erik"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                项目起止时间
-              </label>
-              <div className="flex items-center gap-2">
-                <DatePicker
-                  value={currentProject.startDate}
-                  onChange={(value) => setCurrentProject({ ...currentProject, startDate: value })}
-                  views={['year', 'month']}
+              <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                <TextField
+                  label="项目链接（选填）"
+                  type="url"
+                  value={currentProject.link}
+                  onChange={(e) => setCurrentProject({ ...currentProject, link: e.target.value })}
+                  placeholder="例：github.com/erik"
+                  fullWidth
                 />
-                <span className="text-gray-500">至</span>
-                <DatePicker
-                  value={currentProject.endDate}
-                  onChange={(value) => setCurrentProject({ ...currentProject, endDate: value })}
-                  disabled={currentProject.current}
-                  views={['year', 'month']}
+              </Box>
+              <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                  项目起止时间
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <DatePicker
+                    value={currentProject.startDate}
+                    onChange={(value) => setCurrentProject({ ...currentProject, startDate: value })}
+                    views={['year', 'month']}
+                  />
+                  <Typography color="text.secondary">至</Typography>
+                  <DatePicker
+                    value={currentProject.endDate}
+                    onChange={(value) => setCurrentProject({ ...currentProject, endDate: value })}
+                    disabled={currentProject.current}
+                    views={['year', 'month']}
+                  />
+                </Box>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={currentProject.current}
+                      onChange={(e) => setCurrentProject({ ...currentProject, current: e.target.checked, endDate: e.target.checked ? '' : currentProject.endDate })}
+                      size="small"
+                    />
+                  }
+                  label="至今"
+                  sx={{ mt: 1 }}
                 />
-              </div>
-              <label className="flex items-center mt-2 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={currentProject.current}
-                  onChange={(e) => setCurrentProject({ ...currentProject, current: e.target.checked, endDate: e.target.checked ? '' : currentProject.endDate })}
-                  className="mr-2"
+              </Box>
+              <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    项目描述
+                  </Typography>
+                  <Button
+                    size="small"
+                    startIcon={<AutoFixHighIcon />}
+                    onClick={handlePolish}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    润色
+                  </Button>
+                </Box>
+                <TextField
+                  multiline
+                  rows={8}
+                  value={currentProject.description}
+                  onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
+                  placeholder="请填写内容"
+                  fullWidth
                 />
-                至今
-              </label>
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                项目描述
-              </label>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-gray-500">简历亮点关键词</span>
-                <button
-                  onClick={handlePolish}
-                  className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium text-sm"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                  </svg>
-                  润色
-                </button>
-              </div>
-              <textarea
-                value={currentProject.description}
-                onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
-                placeholder="请填写内容"
-                rows={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black"
-              />
-              <div className="text-right text-sm text-gray-500 mt-1">
-                {currentProject.description.length}/3000
-              </div>
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                项目成果（选填）
-              </label>
-              <textarea
-                value={currentProject.achievements}
-                onChange={(e) => setCurrentProject({ ...currentProject, achievements: e.target.value })}
-                placeholder="请填写内容"
-                rows={5}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 text-black"
-              />
-              <div className="text-right text-sm text-gray-500 mt-1">
-                {currentProject.achievements?.length || 0}/1000
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-3 mt-4">
-            <button
-              onClick={() => setIsAdding(false)}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              取消
-            </button>
-            <button
-              onClick={handleAdd}
-              className="px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
-            >
-              完成
-            </button>
-          </div>
-        </div>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
+                  {currentProject.description.length}/3000
+                </Typography>
+              </Box>
+              <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                <Typography variant="subtitle2" color="text.secondary" mb={1}>
+                  项目成果（选填）
+                </Typography>
+                <TextField
+                  multiline
+                  rows={5}
+                  value={currentProject.achievements}
+                  onChange={(e) => setCurrentProject({ ...currentProject, achievements: e.target.value })}
+                  placeholder="请填写内容"
+                  fullWidth
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
+                  {currentProject.achievements?.length || 0}/1000
+                </Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+              <Button
+                variant="outlined"
+                onClick={() => setIsAdding(false)}
+                sx={{ textTransform: 'none' }}
+              >
+                取消
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleAdd}
+                sx={{ textTransform: 'none' }}
+              >
+                完成
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
       )}
 
       {data.length === 0 && !isAdding && (
-        <div className="text-center py-12 text-gray-500">
-          <div className="text-5xl mb-4">📁</div>
-          <p>暂无项目经历，点击上方&quot;添加&quot;按钮创建</p>
-        </div>
+        <Card sx={{ textAlign: 'center', py: 8 }}>
+          <CardContent>
+            <FolderIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+            <Typography color="text.secondary">
+              暂无项目经历，点击上方&quot;添加&quot;按钮创建
+            </Typography>
+          </CardContent>
+        </Card>
       )}
-    </div>
+    </Box>
   );
 }

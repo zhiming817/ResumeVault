@@ -2,9 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Alert,
+  Chip,
+  Divider,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DownloadIcon from '@mui/icons-material/Download';
+import LockIcon from '@mui/icons-material/Lock';
 import PageLayout from '@/app/components/layout/PageLayout';
 import { ResumeMetadata, ResumeData } from '@/app/lib/types';
-import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useAccount } from 'wagmi';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -12,7 +27,7 @@ interface PageProps {
 
 export default function ResumeView({ params }: PageProps) {
   const router = useRouter();
-  const currentAccount = useCurrentAccount();
+  const { address } = useAccount();
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<ResumeMetadata | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
@@ -28,16 +43,16 @@ export default function ResumeView({ params }: PageProps) {
   }, [params]);
 
   useEffect(() => {
-    if (currentAccount && resumeId) {
+    if (address && resumeId) {
       fetchMetadata(resumeId);
     } else {
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentAccount, resumeId]);
+  }, [address, resumeId]);
 
   const fetchMetadata = async (id: string) => {
-    if (!currentAccount) {
+    if (!address) {
       setIsLoading(false);
       setError('请先连接钱包');
       return;
@@ -48,7 +63,7 @@ export default function ResumeView({ params }: PageProps) {
 
     try {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const response = await fetch(`${apiBaseUrl}/api/resumes/detail/${id}/${currentAccount.address}`);
+      const response = await fetch(`${apiBaseUrl}/api/resumes/${id}/${address}`);
       if (!response.ok) {
         throw new Error('Resume not found');
       }
@@ -128,12 +143,16 @@ export default function ResumeView({ params }: PageProps) {
   if (isLoading) {
     return (
       <PageLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">加载中...</p>
-          </div>
-        </div>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Card sx={{ textAlign: 'center', py: 8 }}>
+            <CardContent>
+              <CircularProgress size={48} />
+              <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+                加载中...
+              </Typography>
+            </CardContent>
+          </Card>
+        </Container>
       </PageLayout>
     );
   }
@@ -141,106 +160,154 @@ export default function ResumeView({ params }: PageProps) {
   if (error && !metadata) {
     return (
       <PageLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <p className="text-xl text-red-600 mb-4">{error}</p>
-            <button
-              onClick={() => router.back()}
-              className="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-            >
-              返回
-            </button>
-          </div>
-        </div>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Card sx={{ textAlign: 'center', py: 8 }}>
+            <CardContent>
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+              <Button
+                variant="contained"
+                onClick={() => router.back()}
+                startIcon={<ArrowBackIcon />}
+              >
+                返回
+              </Button>
+            </CardContent>
+          </Card>
+        </Container>
       </PageLayout>
     );
   }
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Header */}
-        <div className="mb-8">
-          <button
+        <Box sx={{ mb: 4 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
             onClick={() => router.back()}
-            className="mb-4 px-4 py-2 text-white hover:text-white/80 transition-colors flex items-center gap-2"
+            sx={{ mb: 2, textTransform: 'none' }}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
             返回
-          </button>
-          <h1 className="text-3xl font-bold text-white mb-2">查看简历</h1>
-          <p className="text-white/80">下载并预览简历内容</p>
-        </div>
+          </Button>
+          <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+            查看简历
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            下载并预览简历内容
+          </Typography>
+        </Box>
 
         {metadata && (
-          <div className="space-y-6">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* Metadata Card */}
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{metadata.title || metadata.name || '未命名简历'}</h2>
-                {metadata.encrypted && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    🔐 加密简历
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">简介</label>
-                  <p className="text-gray-600">{metadata.summary || '暂无简介'}</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Blob ID</label>
-                  <p className="font-mono text-sm text-gray-600 break-all">{metadata.blobId || metadata.blob_id || '-'}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">创建时间</label>
-                    <p className="text-gray-600">{formatDate(metadata.createdAt || metadata.created_at)}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">更新时间</label>
-                    <p className="text-gray-600">{formatDate(metadata.updatedAt || metadata.updated_at)}</p>
-                  </div>
-                </div>
-
-                {metadata.encrypted && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      加密密钥 *
-                    </label>
-                    <input
-                      type="text"
-                      value={encryptionKey}
-                      onChange={(e) => setEncryptionKey(e.target.value)}
-                      placeholder="请输入加密密钥"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 font-mono text-sm text-black"
+            <Card>
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 3 }}>
+                  <Typography variant="h4" component="h2" fontWeight="bold">
+                    {metadata.title || metadata.name || '未命名简历'}
+                  </Typography>
+                  {metadata.encrypted && (
+                    <Chip
+                      icon={<LockIcon />}
+                      label="加密简历"
+                      color="success"
                     />
-                    <p className="mt-1 text-sm text-gray-500">
-                      {encryptionKey ? '✓ 已找到保存的密钥' : '需要密钥才能解密简历内容'}
-                    </p>
-                  </div>
-                )}
-              </div>
+                  )}
+                </Box>
 
-              <button
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className="w-full px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
-              >
-                {isDownloading ? '下载中...' : '📥 下载并预览简历'}
-              </button>
-            </div>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      简介
+                    </Typography>
+                    <Typography variant="body1">
+                      {metadata.summary || '暂无简介'}
+                    </Typography>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                      Blob ID
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontFamily: 'monospace',
+                        wordBreak: 'break-all',
+                      }}
+                    >
+                      {metadata.blobId || metadata.blob_id || '-'}
+                    </Typography>
+                  </Box>
+
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        创建时间
+                      </Typography>
+                      <Typography variant="body1">
+                        {formatDate(metadata.createdAt || metadata.created_at)}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        更新时间
+                      </Typography>
+                      <Typography variant="body1">
+                        {formatDate(metadata.updatedAt || metadata.updated_at)}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {metadata.encrypted && (
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        加密密钥 *
+                      </Typography>
+                      <Box
+                        component="input"
+                        type="text"
+                        value={encryptionKey}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEncryptionKey(e.target.value)}
+                        placeholder="请输入加密密钥"
+                        sx={{
+                          width: '100%',
+                          p: 1.5,
+                          border: 1,
+                          borderColor: 'grey.300',
+                          borderRadius: 1,
+                          fontFamily: 'monospace',
+                          fontSize: '0.875rem',
+                          '&:focus': {
+                            outline: 'none',
+                            borderColor: 'primary.main',
+                            boxShadow: 1,
+                          },
+                        }}
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        {encryptionKey ? '✓ 已找到保存的密钥' : '需要密钥才能解密简历内容'}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                <Button
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  startIcon={isDownloading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+                  sx={{ mt: 3, textTransform: 'none' }}
+                >
+                  {isDownloading ? '下载中...' : '下载并预览简历'}
+                </Button>
+              </CardContent>
+            </Card>
 
             {/* Resume Preview */}
             {resumeData && (
@@ -401,9 +468,9 @@ export default function ResumeView({ params }: PageProps) {
                 )}
               </div>
             )}
-          </div>
+          </Box>
         )}
-      </div>
+      </Container>
     </PageLayout>
   );
 }

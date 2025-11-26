@@ -2,35 +2,55 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useAccount } from 'wagmi';
+import {
+  Container,
+  Box,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Grid,
+  Chip,
+  CircularProgress,
+  Alert,
+  IconButton,
+  Tooltip,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
+import LockIcon from '@mui/icons-material/Lock';
+import DescriptionIcon from '@mui/icons-material/Description';
 import PageLayout from '@/app/components/layout/PageLayout';
 import { ResumeMetadata } from '@/app/lib/types';
 
 export default function ResumeList() {
   const router = useRouter();
-  const currentAccount = useCurrentAccount();
+  const { address } = useAccount();
   const [resumes, setResumes] = useState<ResumeMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (currentAccount) {
+    if (address) {
       fetchResumes();
     } else {
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentAccount]);
+  }, [address]);
 
   const fetchResumes = async () => {
-    if (!currentAccount) return;
+    if (!address) return;
 
     setIsLoading(true);
     setError(null);
 
     try {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const response = await fetch(`${apiBaseUrl}/api/resumes/my/${currentAccount.address}`);
+      const response = await fetch(`${apiBaseUrl}/api/resumes/my/${address}`);
       if (!response.ok) {
         throw new Error('Failed to fetch resumes');
       }
@@ -93,137 +113,195 @@ export default function ResumeList() {
     }
   };
 
-  if (!currentAccount) {
+  if (!address) {
     return (
       <PageLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <p className="text-xl text-gray-600">请先连接钱包</p>
-          </div>
-        </div>
+        <Container maxWidth="lg" sx={{ py: 8 }}>
+          <Card sx={{ textAlign: 'center', py: 8 }}>
+            <CardContent>
+              <Typography variant="h5" color="text.secondary">
+                请先连接钱包
+              </Typography>
+            </CardContent>
+          </Card>
+        </Container>
       </PageLayout>
     );
   }
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">我的简历</h1>
-            <p className="text-white/80">管理您保存的所有简历</p>
-          </div>
-          <button
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+              我的简历
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              管理您保存的所有简历
+            </Typography>
+          </Box>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<AddIcon />}
             onClick={() => router.push('/resume/create')}
-            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium flex items-center gap-2"
+            sx={{ textTransform: 'none' }}
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
             创建新简历
-          </button>
-        </div>
+          </Button>
+        </Box>
 
         {/* Content */}
         {isLoading ? (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">加载中...</p>
-          </div>
+          <Card sx={{ textAlign: 'center', py: 8 }}>
+            <CardContent>
+              <CircularProgress size={48} />
+              <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+                加载中...
+              </Typography>
+            </CardContent>
+          </Card>
         ) : error ? (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <p className="text-xl text-red-600">{error}</p>
-            <button
-              onClick={fetchResumes}
-              className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-            >
-              重试
-            </button>
-          </div>
+          <Card sx={{ textAlign: 'center', py: 8 }}>
+            <CardContent>
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+              <Button variant="contained" onClick={fetchResumes}>
+                重试
+              </Button>
+            </CardContent>
+          </Card>
         ) : resumes.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <svg
-              className="w-16 h-16 mx-auto text-gray-400 mb-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <p className="text-xl text-gray-600 mb-4">还没有简历</p>
-            <button
-              onClick={() => router.push('/resume/create')}
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              创建第一份简历
-            </button>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {resumes.map((resume) => (
-              <div
-                key={resume.id}
-                className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow"
+          <Card sx={{ textAlign: 'center', py: 8 }}>
+            <CardContent>
+              <DescriptionIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+              <Typography variant="h5" color="text.secondary" gutterBottom>
+                还没有简历
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => router.push('/resume/create')}
+                sx={{ mt: 2, textTransform: 'none' }}
               >
-                {/* Header */}
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 flex-1">
-                    {resume.title || resume.name || '未命名简历'}
-                  </h3>
-                  {resume.encrypted && (
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800">
-                      🔐 加密
-                    </span>
-                  )}
-                </div>
+                创建第一份简历
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                md: 'repeat(2, 1fr)',
+                lg: 'repeat(3, 1fr)',
+              },
+              gap: 3,
+            }}
+          >
+            {resumes.map((resume) => (
+              <Card
+                key={resume.id}
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s',
+                    '&:hover': {
+                      boxShadow: 6,
+                      transform: 'translateY(-4px)',
+                    },
+                  }}
+                >
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    {/* Header */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
+                      <Typography variant="h6" component="h3" fontWeight="bold" sx={{ flex: 1 }}>
+                        {resume.title || resume.name || '未命名简历'}
+                      </Typography>
+                      {resume.encrypted && (
+                        <Chip
+                          icon={<LockIcon />}
+                          label="加密"
+                          size="small"
+                          color="success"
+                          sx={{ ml: 1 }}
+                        />
+                      )}
+                    </Box>
 
-                {/* Summary */}
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {resume.summary || '暂无简介'}
-                </p>
+                    {/* Summary */}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        mb: 2,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {resume.summary || '暂无简介'}
+                    </Typography>
 
-                {/* Meta */}
-                <div className="text-sm text-gray-500 mb-4 space-y-1">
-                  <div>创建时间: {formatDate(resume.created_at || resume.createdAt)}</div>
-                  <div>更新时间: {formatDate(resume.updated_at || resume.updatedAt)}</div>
-                  {(resume.blob_id || resume.blobId) && (
-                    <div className="font-mono text-xs truncate" title={resume.blob_id || resume.blobId}>
-                      Blob ID: {(resume.blob_id || resume.blobId)?.substring(0, 20)}...
-                    </div>
-                  )}
-                </div>
+                    {/* Meta */}
+                    <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+                      <Typography variant="caption" display="block">
+                        创建时间: {formatDate(resume.created_at || resume.createdAt)}
+                      </Typography>
+                      <Typography variant="caption" display="block">
+                        更新时间: {formatDate(resume.updated_at || resume.updatedAt)}
+                      </Typography>
+                      {(resume.blob_id || resume.blobId) && (
+                        <Tooltip title={resume.blob_id || resume.blobId}>
+                          <Typography
+                            variant="caption"
+                            display="block"
+                            sx={{
+                              fontFamily: 'monospace',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            Blob ID: {(resume.blob_id || resume.blobId)?.substring(0, 20)}...
+                          </Typography>
+                        </Tooltip>
+                      )}
+                    </Box>
+                  </CardContent>
 
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleView(resume)}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                  >
-                    查看
-                  </button>
-                  <button
-                    onClick={() => handleDelete(resume.id)}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
-                  >
-                    删除
-                  </button>
-                </div>
-              </div>
+                  <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<VisibilityIcon />}
+                      onClick={() => handleView(resume)}
+                      sx={{ flex: 1, mr: 1, textTransform: 'none' }}
+                    >
+                      查看
+                    </Button>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(resume.id)}
+                      sx={{
+                        border: 1,
+                        borderColor: 'error.main',
+                        '&:hover': { bgcolor: 'error.main', color: 'white' },
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </CardActions>
+                </Card>
             ))}
-          </div>
+          </Box>
         )}
-      </div>
+      </Container>
     </PageLayout>
   );
 }

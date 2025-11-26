@@ -2,20 +2,28 @@
 import { ReactNode } from "react";
 import { base } from "wagmi/chains";
 import { OnchainKitProvider } from "@coinbase/onchainkit";
-import { SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { getFullnodeUrl } from '@mysten/sui/client';
+import { WagmiProvider } from 'wagmi';
+import { http, createConfig } from 'wagmi';
+import { coinbaseWallet } from 'wagmi/connectors';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import "@coinbase/onchainkit/styles.css";
-import '@mysten/dapp-kit/dist/index.css';
 
 const queryClient = new QueryClient();
 
-const networkConfig = {
-  testnet: { url: getFullnodeUrl('testnet') },
-  mainnet: { url: getFullnodeUrl('mainnet') },
-};
+const wagmiConfig = createConfig({
+  chains: [base],
+  connectors: [
+    coinbaseWallet({
+      appName: 'ResumeVault',
+      preference: 'all',
+    }),
+  ],
+  transports: {
+    [base.id]: http(),
+  },
+});
 
 const theme = createTheme({
   palette: {
@@ -31,34 +39,31 @@ const theme = createTheme({
 
 export function RootProvider({ children }: { children: ReactNode }) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SuiClientProvider networks={networkConfig} defaultNetwork="testnet">
-        <WalletProvider autoConnect>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <OnchainKitProvider
-              apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-              chain={base}
-              config={{
-                appearance: {
-                  mode: "auto",
-                },
-                wallet: {
-                  display: "modal",
-                  preference: "all",
-                },
-              }}
-              miniKit={{
-                enabled: true,
-                autoConnect: true,
-                notificationProxyUrl: undefined,
-              }}
-            >
-              {children}
-            </OnchainKitProvider>
-          </ThemeProvider>
-        </WalletProvider>
-      </SuiClientProvider>
-    </QueryClientProvider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <OnchainKitProvider
+            apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+            chain={base}
+            config={{
+              appearance: {
+                mode: "auto",
+              },
+              wallet: {
+                display: "modal",
+                preference: "all",
+              },
+            }}
+            miniKit={{
+              enabled: true,
+              autoConnect: true,
+            }}
+          >
+            {children}
+          </OnchainKitProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

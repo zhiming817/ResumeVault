@@ -2,7 +2,26 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useAccount } from 'wagmi';
+import {
+  Container,
+  Box,
+  Typography,
+  Paper,
+  Button,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  CircularProgress,
+} from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
+import StarIcon from '@mui/icons-material/Star';
+import WorkIcon from '@mui/icons-material/Work';
+import CodeIcon from '@mui/icons-material/Code';
+import FolderIcon from '@mui/icons-material/Folder';
+import SchoolIcon from '@mui/icons-material/School';
+import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import PageLayout from '@/app/components/layout/PageLayout';
 import PersonalInfo from '@/app/components/resume/PersonalInfo';
 import Skills from '@/app/components/resume/Skills';
@@ -15,8 +34,8 @@ import { ResumeData } from '@/app/lib/types';
 
 export default function ResumeCreate() {
   const router = useRouter();
-  const currentAccount = useCurrentAccount();
-  const connected = !!currentAccount;
+  const { address, isConnected } = useAccount();
+  const connected = isConnected;
   const [activeSection, setActiveSection] = useState('personal');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,13 +70,13 @@ export default function ResumeCreate() {
 
   // Sidebar navigation
   const sections = [
-    { id: 'personal', name: 'Personal Info', icon: '👤' },
-    { id: 'skills', name: 'Skills', icon: '⭐' },
-    { id: 'desired', name: 'Desired Position', icon: '💼' },
-    { id: 'work', name: 'Work Experience', icon: '💻' },
-    { id: 'project', name: 'Projects', icon: '📁' },
-    { id: 'education', name: 'Education', icon: '🎓' },
-    { id: 'certificate', name: 'Certificates', icon: '📜' },
+    { id: 'personal', name: 'Personal Info', icon: <PersonIcon /> },
+    { id: 'skills', name: 'Skills', icon: <StarIcon /> },
+    { id: 'desired', name: 'Desired Position', icon: <WorkIcon /> },
+    { id: 'work', name: 'Work Experience', icon: <CodeIcon /> },
+    { id: 'project', name: 'Projects', icon: <FolderIcon /> },
+    { id: 'education', name: 'Education', icon: <SchoolIcon /> },
+    { id: 'certificate', name: 'Certificates', icon: <CardMembershipIcon /> },
   ];
 
   const handleInputChange = (section: string, field: string, value: string) => {
@@ -78,7 +97,7 @@ export default function ResumeCreate() {
 
   const handleSave = async () => {
     // Check wallet connection
-    if (!connected || !currentAccount) {
+    if (!connected || !address) {
       alert('请先连接钱包');
       return;
     }
@@ -104,7 +123,7 @@ export default function ResumeCreate() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          owner: currentAccount.address,
+          owner: address,
           personal: {
             name: formData.personal.name,
             gender: formData.personal.gender,
@@ -199,125 +218,138 @@ export default function ResumeCreate() {
 
   return (
     <PageLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Create Your Resume</h1>
-          <p className="text-white/80">Fill in your professional information</p>
-        </div>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        {/* Header */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+            Create Your Resume
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Fill in your professional information
+          </Typography>
+        </Box>
 
-        <div className="flex gap-8">
+        <Box sx={{ display: 'flex', gap: 3 }}>
           {/* Sidebar */}
-          <div className="w-64 flex-shrink-0">
-            <div className="bg-white rounded-lg shadow-lg p-4 sticky top-24">
-              <nav className="space-y-2">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                      activeSection === section.id
-                        ? 'bg-orange-100 text-orange-600 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <span className="text-xl">{section.icon}</span>
-                    <span>{section.name}</span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          </div>
+          <Paper
+            sx={{
+              width: 280,
+              flexShrink: 0,
+              position: 'sticky',
+              top: 96,
+              alignSelf: 'flex-start',
+            }}
+          >
+            <List component="nav">
+              {sections.map((section) => (
+                <ListItemButton
+                  key={section.id}
+                  selected={activeSection === section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  sx={{
+                    borderRadius: 1,
+                    mx: 1,
+                    my: 0.5,
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>{section.icon}</ListItemIcon>
+                  <ListItemText primary={section.name} />
+                </ListItemButton>
+              ))}
+            </List>
+          </Paper>
 
           {/* Main Content */}
-          <div className="flex-1">
-            <div className="bg-white rounded-lg shadow-lg p-8">
-              {activeSection === 'personal' && (
-                <PersonalInfo formData={formData} handleInputChange={handleInputChange} />
-              )}
-              {activeSection === 'skills' && (
-                <Skills formData={formData} setFormData={setFormData} />
-              )}
-              {activeSection === 'desired' && (
-                <DesiredPosition
-                  data={formData.desiredPosition}
-                  onChange={(field, value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      desiredPosition: {
-                        ...prev.desiredPosition,
-                        [field]: value,
-                      },
-                    }))
-                  }
-                />
-              )}
-              {activeSection === 'work' && (
-                <WorkExperience
-                  data={formData.workExperience}
-                  onChange={(experiences) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      workExperience: experiences,
-                    }))
-                  }
-                />
-              )}
-              {activeSection === 'education' && (
-                <Education
-                  data={formData.education}
-                  onChange={(education) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      education: education,
-                    }))
-                  }
-                />
-              )}
-              {activeSection === 'project' && (
-                <ProjectExperience
-                  data={formData.projectExperience}
-                  onChange={(projects) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      projectExperience: projects,
-                    }))
-                  }
-                />
-              )}
-              {activeSection === 'certificate' && (
-                <Certificates
-                  data={formData.certificates}
-                  onChange={(certificates) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      certificates: certificates,
-                    }))
-                  }
-                />
-              )}
+          <Paper sx={{ flex: 1, p: 4 }}>
+            {activeSection === 'personal' && (
+              <PersonalInfo formData={formData} handleInputChange={handleInputChange} />
+            )}
+            {activeSection === 'skills' && (
+              <Skills formData={formData} setFormData={setFormData} />
+            )}
+            {activeSection === 'desired' && (
+              <DesiredPosition
+                data={formData.desiredPosition}
+                onChange={(field, value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    desiredPosition: {
+                      ...prev.desiredPosition,
+                      [field]: value,
+                    },
+                  }))
+                }
+              />
+            )}
+            {activeSection === 'work' && (
+              <WorkExperience
+                data={formData.workExperience}
+                onChange={(experiences) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    workExperience: experiences,
+                  }))
+                }
+              />
+            )}
+            {activeSection === 'education' && (
+              <Education
+                data={formData.education}
+                onChange={(education) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    education: education,
+                  }))
+                }
+              />
+            )}
+            {activeSection === 'project' && (
+              <ProjectExperience
+                data={formData.projectExperience}
+                onChange={(projects) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    projectExperience: projects,
+                  }))
+                }
+              />
+            )}
+            {activeSection === 'certificate' && (
+              <Certificates
+                data={formData.certificates}
+                onChange={(certificates) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    certificates: certificates,
+                  }))
+                }
+              />
+            )}
 
-              {/* Action Buttons */}
-              <div className="mt-8 flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isSubmitting}
-                  className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Saving...' : 'Save Resume'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            {/* Action Buttons */}
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => router.back()}
+                sx={{ textTransform: 'none' }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={handleSave}
+                disabled={isSubmitting}
+                sx={{ textTransform: 'none' }}
+                startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Resume'}
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+      </Container>
     </PageLayout>
   );
 }
