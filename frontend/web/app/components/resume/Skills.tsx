@@ -1,7 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Box, Typography, TextField, Button } from '@mui/material';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { ResumeData } from '@/app/lib/types';
+import AIPolishDialog from '@/app/components/AIPolishDialog';
 
 interface SkillsProps {
   formData: ResumeData;
@@ -9,6 +12,8 @@ interface SkillsProps {
 }
 
 export default function Skills({ formData, setFormData }: SkillsProps) {
+  const [polishDialogOpen, setPolishDialogOpen] = useState(false);
+
   const handleSkillsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormData((prev) => ({
       ...prev,
@@ -17,53 +22,76 @@ export default function Skills({ formData, setFormData }: SkillsProps) {
   };
 
   const handlePolish = () => {
-    // TODO: Integrate AI service for skill description polishing
-    alert('AI polish feature is under development...');
+    setPolishDialogOpen(true);
+  };
+
+  const handleApplyPolished = (polishedText: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: polishedText,
+    }));
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">⭐ Personal Strengths</h2>
-        <button
-          type="button"
+    <Box>
+      {/* Header with AI Polish Button */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5" fontWeight="bold">
+          ⭐ Personal Strengths
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AutoFixHighIcon />}
           onClick={handlePolish}
-          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg hover:from-purple-600 hover:to-pink-700 transition-colors flex items-center gap-2"
+          sx={{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            '&:hover': {
+              background: 'linear-gradient(135deg, #5568d3 0%, #6a3f8c 100%)',
+            },
+            textTransform: 'none',
+          }}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-            />
-          </svg>
           AI Polish
-        </button>
-      </div>
+        </Button>
+      </Box>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Personal Skills & Strengths Description
-          </label>
-          <textarea
-            value={formData.skills}
-            onChange={handleSkillsChange}
-            placeholder="Describe your professional skills, work experience, personal strengths, etc...&#10;&#10;For example:&#10;• 5+ years Web3 development experience, familiar with Solana/Ethereum ecosystem&#10;• Proficient in React, TypeScript, experienced in large-scale frontend architecture&#10;• Good coding standards and teamwork skills"
-            rows={12}
-            maxLength={1000}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-black"
-          />
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-sm text-gray-500">
-              💡 Tip: Highlight your core competencies, use bullet points for clear skill
-              presentation
-            </p>
-            <span className="text-sm text-gray-500">{formData.skills.length} / 1000</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      {/* Skills Input */}
+      <Box>
+        <Typography variant="body2" color="text.secondary" mb={1}>
+          Personal Skills & Strengths Description
+        </Typography>
+        <TextField
+          multiline
+          rows={12}
+          fullWidth
+          value={formData.skills}
+          onChange={handleSkillsChange}
+          placeholder="Describe your professional skills, work experience, personal strengths, etc...
+
+For example:
+• 5+ years Web3 development experience, familiar with Solana/Ethereum ecosystem
+• Proficient in React, TypeScript, experienced in large-scale frontend architecture
+• Good coding standards and teamwork skills"
+          inputProps={{ maxLength: 1000 }}
+        />
+        <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+          <Typography variant="caption" color="text.secondary">
+            💡 Tip: Highlight your core competencies, use bullet points for clear skill presentation
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {formData.skills.length} / 1000
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* AI Polish Dialog */}
+      <AIPolishDialog
+        open={polishDialogOpen}
+        onClose={() => setPolishDialogOpen(false)}
+        initialText={formData.skills}
+        sectionType="skills"
+        onApply={handleApplyPolished}
+      />
+    </Box>
   );
 }
