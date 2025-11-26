@@ -20,6 +20,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import FolderIcon from '@mui/icons-material/Folder';
 import { ProjectExperience as ProjectExperienceType } from '@/app/lib/types/resume.types';
 import DatePicker from '../shared/DatePicker';
+import AIPolishDialog from '@/app/components/AIPolishDialog';
 
 interface ProjectExperienceProps {
   data: ProjectExperienceType[];
@@ -28,6 +29,7 @@ interface ProjectExperienceProps {
 
 export default function ProjectExperience({ data, onChange }: ProjectExperienceProps) {
   const [isAdding, setIsAdding] = useState(false);
+  const [polishDialogOpen, setPolishDialogOpen] = useState(false);
   const [currentProject, setCurrentProject] = useState<ProjectExperienceType>({
     name: '',
     role: '',
@@ -59,8 +61,11 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
   };
 
   const handlePolish = () => {
-    // TODO: 集成 AI 润色功能
-    console.log('AI 润色功能待实现');
+    setPolishDialogOpen(true);
+  };
+
+  const handleApplyPolished = (polishedText: string) => {
+    setCurrentProject({ ...currentProject, description: polishedText });
   };
 
   return (
@@ -262,6 +267,14 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
           </CardContent>
         </Card>
       )}
+
+      <AIPolishDialog
+        open={polishDialogOpen}
+        onClose={() => setPolishDialogOpen(false)}
+        initialText={currentProject.description}
+        sectionType="project"
+        onApply={handleApplyPolished}
+      />
     </Box>
   );
 }

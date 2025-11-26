@@ -19,6 +19,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import WorkIcon from '@mui/icons-material/Work';
 import { WorkExperience as WorkExperienceType } from '@/app/lib/types/resume.types';
 import DatePicker from '../shared/DatePicker';
+import AIPolishDialog from '@/app/components/AIPolishDialog';
 
 interface WorkExperienceProps {
   data: WorkExperienceType[];
@@ -27,6 +28,7 @@ interface WorkExperienceProps {
 
 export default function WorkExperience({ data, onChange }: WorkExperienceProps) {
   const [isAdding, setIsAdding] = useState(false);
+  const [polishDialogOpen, setPolishDialogOpen] = useState(false);
   const [currentWork, setCurrentWork] = useState<WorkExperienceType>({
     company: '',
     industry: '',
@@ -58,8 +60,11 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
   };
 
   const handlePolish = () => {
-    // TODO: 集成 AI 润色功能
-    console.log('AI 润色功能待实现');
+    setPolishDialogOpen(true);
+  };
+
+  const handleApplyPolished = (polishedText: string) => {
+    setCurrentWork({ ...currentWork, description: polishedText });
   };
 
   return (
@@ -230,6 +235,15 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
           </CardContent>
         </Card>
       )}
+
+      {/* AI Polish Dialog */}
+      <AIPolishDialog
+        open={polishDialogOpen}
+        onClose={() => setPolishDialogOpen(false)}
+        initialText={currentWork.description}
+        sectionType="work_experience"
+        onApply={handleApplyPolished}
+      />
     </Box>
   );
 }
