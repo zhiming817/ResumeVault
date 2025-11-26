@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PageLayout from '@/app/components/layout/PageLayout';
 import { ResumeMetadata, ResumeData } from '@/app/lib/types';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -11,6 +12,8 @@ interface PageProps {
 
 export default function ResumeView({ params }: PageProps) {
   const router = useRouter();
+  const currentAccount = useCurrentAccount();
+  const [resumeId, setResumeId] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<ResumeMetadata | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [encryptionKey, setEncryptionKey] = useState('');
@@ -20,34 +23,56 @@ export default function ResumeView({ params }: PageProps) {
 
   useEffect(() => {
     params.then((p) => {
-      fetchMetadata(p.id);
+      setResumeId(p.id);
     });
+  }, [params]);
+
+  useEffect(() => {
+    if (currentAccount && resumeId) {
+      fetchMetadata(resumeId);
+    } else {
+      setIsLoading(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentAccount, resumeId]);
 
   const fetchMetadata = async (id: string) => {
+    if (!currentAccount) {
+      setIsLoading(false);
+      setError('请先连接钱包');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/resumes/${id}`);
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const response = await fetch(`${apiBaseUrl}/api/resumes/detail/${id}/${currentAccount.address}`);
       if (!response.ok) {
         throw new Error('Resume not found');
       }
 
       const data = await response.json();
-      setMetadata(data);
-
-      // 尝试从 localStorage 获取加密密钥
-      if (data.encrypted) {
-        const savedKeys = JSON.parse(localStorage.getItem('resumeKeys') || '{}');
-        if (savedKeys[data.blobId]) {
-          setEncryptionKey(savedKeys[data.blobId]);
+      console.log('Fetched resume metadata:', data);
+      
+      // 处理demo格式的响应 { success: true, data: {} }
+      if (data.success) {
+        setMetadata(data.data || null);
+        
+        // 尝试从 localStorage 获取加密密钥
+        if (data.data?.encrypted) {
+          const savedKeys = JSON.parse(localStorage.getItem('resumeKeys') || '{}');
+          if (savedKeys[data.data.blobId]) {
+            setEncryptionKey(savedKeys[data.data.blobId]);
+          }
         }
+      } else {
+        throw new Error(data.error || '获取简历信息失败');
       }
     } catch (err) {
       console.error('Failed to fetch metadata:', err);
-      setError('加载简历信息失败');
+      setError(err instanceof Error ? err.message : '加载简历信息失败');
     } finally {
       setIsLoading(false);
     }
@@ -61,6 +86,12 @@ export default function ResumeView({ params }: PageProps) {
       return;
     }
 
+    const blobId = metadata.blobId || metadata.blob_id;
+    if (!blobId) {
+      alert('简历数据缺失');
+      return;
+    }
+
     setIsDownloading(true);
     setError(null);
 
@@ -69,7 +100,7 @@ export default function ResumeView({ params }: PageProps) {
       const { downloadResume } = await import('@/app/lib/services/resume.service');
 
       const data = await downloadResume(
-        metadata.blobId,
+        blobId,
         metadata.encrypted ? encryptionKey : undefined
       );
 
@@ -85,7 +116,8 @@ export default function ResumeView({ params }: PageProps) {
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
@@ -152,7 +184,7 @@ export default function ResumeView({ params }: PageProps) {
             {/* Metadata Card */}
             <div className="bg-white rounded-lg shadow-lg p-8">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">{metadata.title}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{metadata.title || metadata.name || '未命名简历'}</h2>
                 {metadata.encrypted && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                     🔐 加密简历
@@ -163,22 +195,22 @@ export default function ResumeView({ params }: PageProps) {
               <div className="space-y-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">简介</label>
-                  <p className="text-gray-600">{metadata.summary}</p>
+                  <p className="text-gray-600">{metadata.summary || '暂无简介'}</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Blob ID</label>
-                  <p className="font-mono text-sm text-gray-600 break-all">{metadata.blobId}</p>
+                  <p className="font-mono text-sm text-gray-600 break-all">{metadata.blobId || metadata.blob_id || '-'}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">创建时间</label>
-                    <p className="text-gray-600">{formatDate(metadata.createdAt)}</p>
+                    <p className="text-gray-600">{formatDate(metadata.createdAt || metadata.created_at)}</p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">更新时间</label>
-                    <p className="text-gray-600">{formatDate(metadata.updatedAt)}</p>
+                    <p className="text-gray-600">{formatDate(metadata.updatedAt || metadata.updated_at)}</p>
                   </div>
                 </div>
 
