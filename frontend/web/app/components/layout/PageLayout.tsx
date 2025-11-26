@@ -20,19 +20,13 @@ export default function PageLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <div className="relative min-h-screen">
-      {/* Background Image for non-home pages */}
+      {/* Modern gradient background */}
       <div
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: 'url(/hero.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
         }}
       />
-
-      {/* Overlay for better content readability */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-br from-blue-900/70 via-purple-900/70 to-indigo-900/70" />
 
       {/* Content */}
       <div className="relative z-10">
