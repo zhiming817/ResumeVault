@@ -1,6 +1,7 @@
 use actix_web::web;
 use crate::controllers::{weather_handler, premium_content_handler, ResumeController, UnlockRecordController, AccessLogController};
 use crate::controllers::user_controller;
+use crate::services::ai_service::polish_text_handler;
 
 /// 配置示例路由
 #[allow(dead_code)]
@@ -69,5 +70,14 @@ pub fn config_access_log_routes(cfg: &mut web::ServiceConfig) {
             .route("/accessor/{accessor}", web::get().to(AccessLogController::get_accessor_logs))
             // 统计简历访问次数
             .route("/count/{resume_id}", web::get().to(AccessLogController::count_resume_access)),
+    );
+}
+
+/// 配置 AI 路由
+pub fn config_ai_routes(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/api/ai")
+            // AI 润色文本
+            .route("/polish", web::post().to(polish_text_handler)),
     );
 }

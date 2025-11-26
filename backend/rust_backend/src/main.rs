@@ -71,6 +71,9 @@ async fn main() -> std::io::Result<()> {
     println!("  GET  /api/access-logs/accessor/{{address}}     - Get accessor's logs");
     println!("  GET  /api/access-logs/count/{{id}}             - Count resume access");
     println!();
+    println!("🤖 AI Endpoints:");
+    println!("  POST /api/ai/polish                          - Polish resume text with AI");
+    println!();
 
     // 启动服务器
     HttpServer::new(move || {
@@ -88,6 +91,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::config_resume_routes)
             .configure(routes::config_unlock_record_routes)
             .configure(routes::config_access_log_routes)
+            .configure(routes::config_ai_routes)
     })
     .bind(&bind_addr)?
     .run()
