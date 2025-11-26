@@ -18,22 +18,13 @@ impl ResumeController {
 
         let request = req.into_inner();
         
-        // 检查是否提供了 blob_id（Walrus 存储）
-        let blob_id = match request.blob_id.as_ref() {
-            Some(id) if !id.is_empty() => id.clone(),
-            _ => {
-                // 向后兼容：检查旧的 ipfs_cid 字段
-                match request.ipfs_cid.as_ref() {
-                    Some(cid) if !cid.is_empty() => cid.clone(),
-                    _ => {
-                        let response = ApiResponse::<()>::error(
-                            "Blob ID is required. Please encrypt and upload the resume to Walrus first.".to_string()
-                        );
-                        return HttpResponse::BadRequest().json(response);
-                    }
-                }
-            }
-        };
+        // 不再要求 blob_id，生成一个占位符或使用空字符串
+        // 简历数据将直接存储在数据库的 summary 字段中
+        let blob_id = request.blob_id
+            .as_ref()
+            .and_then(|id| if id.is_empty() { None } else { Some(id.clone()) })
+            .or_else(|| request.ipfs_cid.as_ref().and_then(|cid| if cid.is_empty() { None } else { Some(cid.clone()) }))
+            .unwrap_or_else(|| format!("local-{}", uuid::Uuid::new_v4()));
 
         println!("Creating resume with blob_id: {}, encryption_type: {:?}", 
                  blob_id, request.encryption_type);

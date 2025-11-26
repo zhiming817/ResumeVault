@@ -11,7 +11,7 @@ import WorkExperience from '@/app/components/resume/WorkExperience';
 import Education from '@/app/components/resume/Education';
 import ProjectExperience from '@/app/components/resume/ProjectExperience';
 import Certificates from '@/app/components/resume/Certificates';
-import { ResumeData, CreateResumeRequest } from '@/app/lib/types';
+import { ResumeData } from '@/app/lib/types';
 
 export default function ResumeCreate() {
   const router = useRouter();
@@ -86,11 +86,8 @@ export default function ResumeCreate() {
     setIsSubmitting(true);
 
     try {
-      // Dynamically import resume service to avoid WASM SSR issues
-      const { createResume, validateResumeData } = await import('@/app/lib/services/resume.service');
-
-      // Validate resume data
-      if (!validateResumeData(formData)) {
+      // 验证必填字段
+      if (!formData.personal.name || !formData.personal.email) {
         alert('请填写必填信息：姓名和邮箱');
         setIsSubmitting(false);
         return;
@@ -99,46 +96,98 @@ export default function ResumeCreate() {
       console.log('💾 Saving resume...');
       console.log('📋 Data:', formData);
 
-      // Create resume and upload to Walrus (without encryption)
-      const result = await createResume(formData, false);
-
-      console.log('✅ Resume saved successfully!');
-      console.log('🆔 Blob ID:', result.blobId);
-      console.log('🔑 Encryption Key:', result.encryptionKey ? result.encryptionKey.substring(0, 20) + '...' : 'None');
-      console.log('🌐 URL:', result.url);
-
-      // 保存元数据到后端 API
-      const resumeTitle = `${formData.personal.name} - ${formData.desiredPosition.position || '求职者'}`;
-      const resumeSummary = `${formData.skills.substring(0, 100)}${formData.skills.length > 100 ? '...' : ''}`;
-
-      const createRequest: CreateResumeRequest = {
-        blobId: result.blobId,
-        owner: currentAccount.address,
-        title: resumeTitle,
-        summary: resumeSummary,
-        encrypted: false,
-      };
-
-      console.log('💾 Saving metadata to API...');
-      const apiResponse = await fetch('/api/resumes', {
+      // 直接调用后端 API 保存简历
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const apiResponse = await fetch(`${apiBaseUrl}/api/resumes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(createRequest),
+        body: JSON.stringify({
+          owner: currentAccount.address,
+          personal: {
+            name: formData.personal.name,
+            gender: formData.personal.gender,
+            birth_date: formData.personal.birthDate,
+            work_start_date: formData.personal.workStartDate,
+            job_status: formData.personal.jobStatus,
+            identity: formData.personal.identity,
+            phone: formData.personal.phone,
+            wechat: formData.personal.wechat,
+            email: formData.personal.email,
+          },
+          skills: formData.skills,
+          desired_position: {
+            job_type: formData.desiredPosition.jobType,
+            position: formData.desiredPosition.position,
+            industry: formData.desiredPosition.industry,
+            salary_min: formData.desiredPosition.salaryMin ? parseInt(formData.desiredPosition.salaryMin, 10) : 0,
+            salary_max: formData.desiredPosition.salaryMax ? parseInt(formData.desiredPosition.salaryMax, 10) : 0,
+            city: formData.desiredPosition.city,
+            other_cities: formData.desiredPosition.otherCities 
+              ? formData.desiredPosition.otherCities.split(',').map(c => c.trim()).filter(c => c.length > 0)
+              : [],
+          },
+          work_experience: formData.workExperience.map(exp => ({
+            company: exp.company,
+            industry: exp.industry,
+            department: exp.department,
+            position: exp.position,
+            start_date: exp.startDate,
+            end_date: exp.endDate,
+            current: exp.current,
+            description: exp.description,
+          })),
+          project_experience: formData.projectExperience.map(proj => ({
+            name: proj.name,
+            role: proj.role,
+            link: proj.link || undefined,
+            start_date: proj.startDate,
+            end_date: proj.endDate,
+            current: proj.current,
+            description: proj.description,
+            achievements: proj.achievements || undefined,
+            technologies: proj.technologies || undefined,
+          })),
+          education: formData.education.map(edu => ({
+            school: edu.school,
+            degree: edu.degree,
+            education_type: edu.educationType,
+            major: edu.major,
+            start_date: edu.startDate,
+            end_date: edu.endDate,
+            experience: edu.experience || undefined,
+            thesis: edu.thesis || undefined,
+            thesis_description: edu.thesisDescription || undefined,
+          })),
+          certificates: formData.certificates.map(cert => ({
+            name: cert.name,
+            issuer: cert.issuer,
+            issue_date: cert.issueDate,
+            expiry_date: cert.expiryDate || undefined,
+            no_expiry: cert.noExpiry,
+            certificate_no: cert.certificateNo || undefined,
+            description: cert.description || undefined,
+          })),
+        }),
       });
 
       if (!apiResponse.ok) {
-        throw new Error('Failed to save resume metadata');
+        const errorData = await apiResponse.json();
+        throw new Error(errorData.error || 'Failed to save resume');
       }
 
-      const resumeMetadata = await apiResponse.json();
-      console.log('✅ Metadata saved:', resumeMetadata);
+      const result = await apiResponse.json();
+      console.log('✅ Resume saved:', result);
 
-      alert(`简历保存成功！\n\nBlob ID: ${result.blobId}`);
-
-      // Navigate to success page or resume list
-      router.push('/resume');
+      // 处理响应格式 { success: true, data: {...} }
+      if (result.success) {
+        alert(`简历保存成功！`);
+        // Navigate to resume list
+        router.push('/resume/list');
+      } else {
+        throw new Error(result.error || '保存简历失败');
+      }
     } catch (error) {
       console.error('❌ Failed to save resume:', error);
       const message = error instanceof Error ? error.message : 'Unknown error';
