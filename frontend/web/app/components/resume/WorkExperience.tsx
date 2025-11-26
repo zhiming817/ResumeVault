@@ -66,7 +66,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h5" fontWeight="bold">
-          工作经历
+          Work Experience
         </Typography>
         <Button
           variant="contained"
@@ -74,7 +74,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
           onClick={() => setIsAdding(true)}
           sx={{ textTransform: 'none' }}
         >
-          添加
+          Add
         </Button>
       </Box>
 
@@ -88,7 +88,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
                   {work.company} - {work.position}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {work.startDate} - {work.current ? '至今' : work.endDate}
+                  {work.startDate} - {work.current ? 'Present' : work.endDate}
                 </Typography>
               </Box>
               <Box sx={{ display: 'flex', gap: 1 }}>
@@ -112,40 +112,40 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
         <Card sx={{ border: 2, borderColor: 'primary.main', bgcolor: 'primary.50' }}>
           <CardContent>
             <Typography variant="h6" fontWeight="bold" mb={2}>
-              编辑工作经历
+              Edit Work Experience
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
               <TextField
-                label="公司名称"
+                label="Company Name"
                 value={currentWork.company}
                 onChange={(e) => setCurrentWork({ ...currentWork, company: e.target.value })}
-                placeholder="ABC科技有限公司"
+                placeholder="ABC Technology Co., Ltd."
                 fullWidth
               />
               <TextField
-                label="所属行业"
+                label="Industry"
                 value={currentWork.industry}
                 onChange={(e) => setCurrentWork({ ...currentWork, industry: e.target.value })}
-                placeholder="互联网"
+                placeholder="Internet"
                 fullWidth
               />
               <TextField
-                label="所属部门（选填）"
+                label="Department (Optional)"
                 value={currentWork.department}
                 onChange={(e) => setCurrentWork({ ...currentWork, department: e.target.value })}
-                placeholder="例：产品部"
+                placeholder="e.g.: Product Department"
                 fullWidth
               />
               <TextField
-                label="职位名称"
+                label="Position"
                 value={currentWork.position}
                 onChange={(e) => setCurrentWork({ ...currentWork, position: e.target.value })}
-                placeholder="全栈开发"
+                placeholder="Full Stack Developer"
                 fullWidth
               />
               <Box>
                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                  在职时间
+                  Employment Period
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <DatePicker
@@ -153,7 +153,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
                     onChange={(value) => setCurrentWork({ ...currentWork, startDate: value })}
                     views={['year', 'month']}
                   />
-                  <Typography color="text.secondary">至</Typography>
+                  <Typography color="text.secondary">to</Typography>
                   <DatePicker
                     value={currentWork.endDate}
                     onChange={(value) => setCurrentWork({ ...currentWork, endDate: value })}
@@ -169,14 +169,14 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
                       size="small"
                     />
                   }
-                  label="至今"
+                  label="Present"
                   sx={{ mt: 1 }}
                 />
               </Box>
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="subtitle2" color="text.secondary">
-                    工作描述
+                    Job Description
                   </Typography>
                   <Button
                     size="small"
@@ -184,7 +184,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
                     onClick={handlePolish}
                     sx={{ textTransform: 'none' }}
                   >
-                    润色
+                    Polish
                   </Button>
                 </Box>
                 <TextField
@@ -192,7 +192,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
                   rows={8}
                   value={currentWork.description}
                   onChange={(e) => setCurrentWork({ ...currentWork, description: e.target.value })}
-                  placeholder="1. 完成模块开发；&#10;2. 协调测试人员完成模块测试；&#10;3. 参与技术攻关讨论并提供建议；&#10;4. 编写相关开发文档。"
+                  placeholder="1. Completed module development;&#10;2. Coordinated with testers for module testing;&#10;3. Participated in technical discussions and provided suggestions;&#10;4. Wrote related development documentation."
                   fullWidth
                 />
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
@@ -206,14 +206,14 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
                 onClick={() => setIsAdding(false)}
                 sx={{ textTransform: 'none' }}
               >
-                取消
+                Cancel
               </Button>
               <Button
                 variant="contained"
                 onClick={handleAdd}
                 sx={{ textTransform: 'none' }}
               >
-                完成
+                Done
               </Button>
             </Box>
           </CardContent>
@@ -225,7 +225,7 @@ export default function WorkExperience({ data, onChange }: WorkExperienceProps) 
           <CardContent>
             <WorkIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
             <Typography color="text.secondary">
-              暂无工作经历，点击上方&quot;添加&quot;按钮创建
+              No work experience yet. Click &quot;Add&quot; button above to create one.
             </Typography>
           </CardContent>
         </Card>

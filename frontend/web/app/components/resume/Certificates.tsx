@@ -58,7 +58,7 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h5" fontWeight="bold">
-          证书
+          Certificates
         </Typography>
         <Button
           variant="contained"
@@ -66,7 +66,7 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
           onClick={() => setIsAdding(true)}
           sx={{ textTransform: 'none' }}
         >
-          添加
+          Add
         </Button>
       </Box>
 
@@ -82,16 +82,16 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
                     {cert.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {cert.issuer} | 颁发时间：{cert.issueDate}
+                    {cert.issuer} | Issue Date: {cert.issueDate}
                   </Typography>
                   {cert.certificateNo && (
                     <Typography variant="body2" color="text.secondary">
-                      证书编号：{cert.certificateNo}
+                      Certificate No.: {cert.certificateNo}
                     </Typography>
                   )}
                   {!cert.noExpiry && cert.expiryDate && (
                     <Typography variant="body2" color="text.secondary">
-                      有效期至：{cert.expiryDate}
+                      Valid Until: {cert.expiryDate}
                     </Typography>
                   )}
                 </Box>
@@ -119,26 +119,26 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
         <Card sx={{ border: 2, borderColor: 'primary.main', bgcolor: 'primary.50' }}>
           <CardContent>
             <Typography variant="h6" fontWeight="bold" mb={2}>
-              编辑证书
+              Edit Certificate
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
               <TextField
-                label="证书名称"
+                label="Certificate Name"
                 value={currentCert.name}
                 onChange={(e) => setCurrentCert({ ...currentCert, name: e.target.value })}
-                placeholder="软件设计师"
+                placeholder="Software Designer"
                 fullWidth
               />
               <TextField
-                label="颁发机构"
+                label="Issuing Organization"
                 value={currentCert.issuer}
                 onChange={(e) => setCurrentCert({ ...currentCert, issuer: e.target.value })}
-                placeholder="中国计算机技术职业资格网"
+                placeholder="China Computer Technology Qualification Network"
                 fullWidth
               />
               <Box>
                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                  颁发时间
+                  Issue Date
                 </Typography>
                 <DatePicker
                   value={currentCert.issueDate}
@@ -148,7 +148,7 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
               </Box>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                  有效期至
+                  Valid Until
                 </Typography>
                 <DatePicker
                   value={currentCert.expiryDate || ''}
@@ -164,13 +164,13 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
                       size="small"
                     />
                   }
-                  label="长期有效"
+                  label="No Expiry"
                   sx={{ mt: 1 }}
                 />
               </Box>
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <TextField
-                  label="证书编号（选填）"
+                  label="Certificate Number (Optional)"
                   value={currentCert.certificateNo}
                   onChange={(e) => setCurrentCert({ ...currentCert, certificateNo: e.target.value })}
                   placeholder="123456789"
@@ -179,12 +179,12 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
               </Box>
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <TextField
-                  label="证书描述（选填）"
+                  label="Description (Optional)"
                   multiline
                   rows={4}
                   value={currentCert.description}
                   onChange={(e) => setCurrentCert({ ...currentCert, description: e.target.value })}
-                  placeholder="简要描述证书的价值与难度"
+                  placeholder="Briefly describe the value and difficulty of the certificate"
                   fullWidth
                 />
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
@@ -198,14 +198,14 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
                 onClick={() => setIsAdding(false)}
                 sx={{ textTransform: 'none' }}
               >
-                取消
+                Cancel
               </Button>
               <Button
                 variant="contained"
                 onClick={handleAdd}
                 sx={{ textTransform: 'none' }}
               >
-                完成
+                Done
               </Button>
             </Box>
           </CardContent>
@@ -217,7 +217,7 @@ export default function Certificates({ data, onChange }: CertificatesProps) {
           <CardContent>
             <CardMembershipIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
             <Typography color="text.secondary">
-              暂无证书，点击上方&quot;添加&quot;按钮创建
+              No certificates yet. Click &quot;Add&quot; button above to create one.
             </Typography>
           </CardContent>
         </Card>

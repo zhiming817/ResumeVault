@@ -98,16 +98,16 @@ export default function ResumeCreate() {
   const handleSave = async () => {
     // Check wallet connection
     if (!connected || !address) {
-      alert('请先连接钱包');
+      alert('Please connect your wallet first');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // 验证必填字段
+      // Validate required fields
       if (!formData.personal.name || !formData.personal.email) {
-        alert('请填写必填信息：姓名和邮箱');
+        alert('Please fill in required fields: Name and Email');
         setIsSubmitting(false);
         return;
       }
@@ -199,18 +199,18 @@ export default function ResumeCreate() {
       const result = await apiResponse.json();
       console.log('✅ Resume saved:', result);
 
-      // 处理响应格式 { success: true, data: {...} }
+      // Process response format { success: true, data: {...} }
       if (result.success) {
-        alert(`简历保存成功！`);
+        alert(`Resume saved successfully!`);
         // Navigate to resume list
         router.push('/resume/list');
       } else {
-        throw new Error(result.error || '保存简历失败');
+        throw new Error(result.error || 'Failed to save resume');
       }
     } catch (error) {
       console.error('❌ Failed to save resume:', error);
       const message = error instanceof Error ? error.message : 'Unknown error';
-      alert(`保存简历失败: ${message}`);
+      alert(`Failed to save resume: ${message}`);
     } finally {
       setIsSubmitting(false);
     }

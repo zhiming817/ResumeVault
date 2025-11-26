@@ -21,12 +21,12 @@ export default function DesiredPosition({ data, onChange }: DesiredPositionProps
   return (
     <Box>
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        编辑求职期望
+        Edit Desired Position
       </Typography>
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 3 }}>
         <Box>
           <Typography variant="subtitle2" color="text.secondary" mb={1}>
-            工作性质
+            Job Type
           </Typography>
           <ToggleButtonGroup
             value={data.jobType}
@@ -37,36 +37,17 @@ export default function DesiredPosition({ data, onChange }: DesiredPositionProps
           >
             <ToggleButton value="fulltime" sx={{ textTransform: 'none' }}>
               <WorkIcon sx={{ mr: 1 }} />
-              全职
+              Full-time
             </ToggleButton>
             <ToggleButton value="parttime" sx={{ textTransform: 'none' }}>
               <AccessTimeIcon sx={{ mr: 1 }} />
-              兼职
+              Part-time
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>
-
-        <TextField
-          label="期望职位"
-          value={data.position}
-          onChange={(e) => onChange('position', e.target.value)}
-          placeholder="Java开发工程师"
-          fullWidth
-        />
-
-        <Box sx={{ gridColumn: { md: 'span 2' } }}>
-          <TextField
-            label="期望行业"
-            value={data.industry}
-            onChange={(e) => onChange('industry', e.target.value)}
-            placeholder="企业服务、电商、医疗健康"
-            fullWidth
-          />
-        </Box>
-
         <Box>
           <Typography variant="subtitle2" color="text.secondary" mb={1}>
-            薪资要求
+            Salary Range
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <TextField
@@ -76,7 +57,7 @@ export default function DesiredPosition({ data, onChange }: DesiredPositionProps
               placeholder="13k"
               fullWidth
             />
-            <Typography color="text.secondary">至</Typography>
+            <Typography color="text.secondary">to</Typography>
             <TextField
               type="number"
               value={data.salaryMax}
@@ -86,21 +67,42 @@ export default function DesiredPosition({ data, onChange }: DesiredPositionProps
             />
           </Box>
         </Box>
-
-        <TextField
-          label="工作城市"
-          value={data.city}
-          onChange={(e) => onChange('city', e.target.value)}
-          placeholder="上海"
-          fullWidth
-        />
-
-        <Box sx={{ gridColumn: { md: 'span 2' } }}>
+         <Box sx={{ gridColumn: { md: 'span 1' } }}>
           <TextField
-            label="其他感兴趣城市（选填）"
+            label="Desired Position"
+            value={data.position}
+            onChange={(e) => onChange('position', e.target.value)}
+            placeholder="Java Developer"
+            fullWidth
+          />
+        </Box>
+        <Box sx={{ gridColumn: { md: 'span 1' } }}>
+          <TextField
+            label="Industry"
+            value={data.industry}
+            onChange={(e) => onChange('industry', e.target.value)}
+            placeholder="Enterprise, E-commerce, Healthcare"
+            fullWidth
+          />
+        </Box>
+
+        
+        <Box sx={{ gridColumn: { md: 'span 1' } }}>
+            <TextField
+              label="Work City"
+              value={data.city}
+              onChange={(e) => onChange('city', e.target.value)}
+              placeholder="Shanghai"
+              fullWidth
+            />
+        </Box>
+
+        <Box sx={{ gridColumn: { md: 'span 1' } }}>
+          <TextField
+            label="Other Cities (Optional)"
             value={data.otherCities || ''}
             onChange={(e) => onChange('otherCities', e.target.value)}
-            placeholder="苏州"
+            placeholder="Suzhou"
             fullWidth
           />
         </Box>

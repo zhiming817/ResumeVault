@@ -67,7 +67,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h5" fontWeight="bold">
-          项目经历
+          Project Experience
         </Typography>
         <Button
           variant="contained"
@@ -75,7 +75,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
           onClick={() => setIsAdding(true)}
           sx={{ textTransform: 'none' }}
         >
-          添加
+          Add
         </Button>
       </Box>
 
@@ -89,7 +89,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
                   {project.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {project.role} | {project.startDate} - {project.current ? '至今' : project.endDate}
+                  {project.role} | {project.startDate} - {project.current ? 'Present' : project.endDate}
                 </Typography>
                 {project.link && (
                   <Link href={project.link} target="_blank" rel="noopener noreferrer" variant="body2">
@@ -108,7 +108,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
             </Box>
             <Box sx={{ mt: 2 }}>
               <Typography variant="body2" fontWeight="medium" gutterBottom>
-                项目描述：
+                Project Description:
               </Typography>
               <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
                 {project.description}
@@ -117,7 +117,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
             {project.achievements && (
               <Box sx={{ mt: 2 }}>
                 <Typography variant="body2" fontWeight="medium" gutterBottom>
-                  项目成果：
+                  Achievements:
                 </Typography>
                 <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
                   {project.achievements}
@@ -133,35 +133,35 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
         <Card sx={{ border: 2, borderColor: 'primary.main', bgcolor: 'primary.50' }}>
           <CardContent>
             <Typography variant="h6" fontWeight="bold" mb={2}>
-              编辑项目经历
+              Edit Project Experience
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
               <TextField
-                label="项目名称"
+                label="Project Name"
                 value={currentProject.name}
                 onChange={(e) => setCurrentProject({ ...currentProject, name: e.target.value })}
                 fullWidth
               />
               <TextField
-                label="项目角色"
+                label="Role"
                 value={currentProject.role}
                 onChange={(e) => setCurrentProject({ ...currentProject, role: e.target.value })}
-                placeholder="全栈开发工程师"
+                placeholder="Full Stack Developer"
                 fullWidth
               />
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <TextField
-                  label="项目链接（选填）"
+                  label="Project Link (Optional)"
                   type="url"
                   value={currentProject.link}
                   onChange={(e) => setCurrentProject({ ...currentProject, link: e.target.value })}
-                  placeholder="例：github.com/erik"
+                  placeholder="e.g.: github.com/erik"
                   fullWidth
                 />
               </Box>
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                  项目起止时间
+                  Project Duration
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <DatePicker
@@ -169,7 +169,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
                     onChange={(value) => setCurrentProject({ ...currentProject, startDate: value })}
                     views={['year', 'month']}
                   />
-                  <Typography color="text.secondary">至</Typography>
+                  <Typography color="text.secondary">to</Typography>
                   <DatePicker
                     value={currentProject.endDate}
                     onChange={(value) => setCurrentProject({ ...currentProject, endDate: value })}
@@ -185,14 +185,14 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
                       size="small"
                     />
                   }
-                  label="至今"
+                  label="Present"
                   sx={{ mt: 1 }}
                 />
               </Box>
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="subtitle2" color="text.secondary">
-                    项目描述
+                    Project Description
                   </Typography>
                   <Button
                     size="small"
@@ -200,7 +200,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
                     onClick={handlePolish}
                     sx={{ textTransform: 'none' }}
                   >
-                    润色
+                    Polish
                   </Button>
                 </Box>
                 <TextField
@@ -208,7 +208,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
                   rows={8}
                   value={currentProject.description}
                   onChange={(e) => setCurrentProject({ ...currentProject, description: e.target.value })}
-                  placeholder="请填写内容"
+                  placeholder="Please enter content"
                   fullWidth
                 />
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
@@ -217,14 +217,14 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
               </Box>
               <Box sx={{ gridColumn: { md: 'span 2' } }}>
                 <Typography variant="subtitle2" color="text.secondary" mb={1}>
-                  项目成果（选填）
+                  Project Achievements (Optional)
                 </Typography>
                 <TextField
                   multiline
                   rows={5}
                   value={currentProject.achievements}
                   onChange={(e) => setCurrentProject({ ...currentProject, achievements: e.target.value })}
-                  placeholder="请填写内容"
+                  placeholder="Please enter content"
                   fullWidth
                 />
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
@@ -238,14 +238,14 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
                 onClick={() => setIsAdding(false)}
                 sx={{ textTransform: 'none' }}
               >
-                取消
+                Cancel
               </Button>
               <Button
                 variant="contained"
                 onClick={handleAdd}
                 sx={{ textTransform: 'none' }}
               >
-                完成
+                Done
               </Button>
             </Box>
           </CardContent>
@@ -257,7 +257,7 @@ export default function ProjectExperience({ data, onChange }: ProjectExperienceP
           <CardContent>
             <FolderIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
             <Typography color="text.secondary">
-              暂无项目经历，点击上方&quot;添加&quot;按钮创建
+              No project experience yet. Click &quot;Add&quot; button above to create one.
             </Typography>
           </CardContent>
         </Card>
