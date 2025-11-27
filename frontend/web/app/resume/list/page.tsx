@@ -54,7 +54,7 @@ export default function ResumeList() {
     setError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/resumes/my/${address}`);
+      const response = await fetch(`https://miniapp.egtoy.xyz/backend/api/resumes/my/${address}`);
       if (!response.ok) {
         throw new Error('Failed to fetch resumes');
       }
