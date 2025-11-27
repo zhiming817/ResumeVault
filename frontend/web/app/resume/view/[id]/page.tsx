@@ -19,6 +19,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import LockIcon from '@mui/icons-material/Lock';
 import PageLayout from '@/app/components/layout/PageLayout';
 import { API_BASE_URL } from '@/app/lib/config/api.config';
+import { ResumeMetadata, ResumeData } from '@/app/lib/types';
 import { useAccount } from 'wagmi';
 
 interface PageProps {

@@ -38,7 +38,7 @@ async fn main() -> std::io::Result<()> {
     println!();
 
     // 读取服务器配置
-    let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let host = env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
     let port = env::var("PORT").unwrap_or_else(|_| "4021".to_string());
     let bind_addr = format!("{}:{}", host, port);
     
