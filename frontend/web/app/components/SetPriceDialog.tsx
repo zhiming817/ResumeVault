@@ -63,7 +63,7 @@ export default function SetPriceDialog({
       // Convert SOL to lamports (1 SOL = 1,000,000,000 lamports)
       const priceInLamports = Math.floor(priceNum * 1_000_000_000);
 
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://miniapp.egtoy.xyz/backend';
       const response = await fetch(`${apiBaseUrl}/api/resumes/price`, {
         method: 'PUT',
         headers: {

@@ -62,7 +62,7 @@ export default function ResumeView({ params }: PageProps) {
     setError(null);
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://miniapp.egtoy.xyz/backend';
       const response = await fetch(`${apiBaseUrl}/api/resumes/${id}/${address}`);
       if (!response.ok) {
         throw new Error('Resume not found');

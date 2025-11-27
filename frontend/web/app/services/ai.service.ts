@@ -25,6 +25,6 @@ export const aiService = {
       throw new Error(response.error || 'Failed to polish text');
     }
 
-    return response.data.data;
+    return response.data.data!;
   },
 };
