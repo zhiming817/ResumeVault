@@ -32,8 +32,11 @@ export async function GET(
     
     // 按更新时间倒序排序
     const sortedResumes = userResumes.sort(
-      (a: ResumeMetadata, b: ResumeMetadata) => 
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      (a: ResumeMetadata, b: ResumeMetadata) => {
+        const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return timeB - timeA;
+      }
     );
 
     // 返回与demo一致的格式

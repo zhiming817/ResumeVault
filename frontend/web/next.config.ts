@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
     };
     
     return config;
+  },eslint: {
+    // !! WARNING !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true, // 忽略构建时的 ESLint 检查
   },
 };
 

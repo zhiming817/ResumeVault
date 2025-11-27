@@ -21,6 +21,10 @@ export const aiService = {
       data: PolishResponse;
     }>('/api/ai/polish', request);
     
+    if (!response.success || !response.data) {
+      throw new Error(response.error || 'Failed to polish text');
+    }
+
     return response.data.data;
   },
 };

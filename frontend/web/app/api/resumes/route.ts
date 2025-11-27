@@ -21,7 +21,11 @@ export async function GET(request: NextRequest) {
     // 过滤出该用户的简历
     const userResumes = Array.from(resumesStore.values())
       .filter((resume) => resume.owner === owner)
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      .sort((a, b) => {
+        const timeA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const timeB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return timeB - timeA;
+      });
 
     return NextResponse.json({
       resumes: userResumes,

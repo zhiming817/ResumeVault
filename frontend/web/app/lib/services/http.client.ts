@@ -30,6 +30,8 @@ class HttpClient {
     try {
       const response = await fetch(url, {
         ...fetchOptions,
+        mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           ...fetchOptions.headers,

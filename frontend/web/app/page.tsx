@@ -139,7 +139,7 @@ export default function Home() {
 
         <Grid container spacing={4} justifyContent="center">
           {/* Feature 1 */}
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Card
               sx={{
                 height: '100%',
@@ -178,7 +178,7 @@ export default function Home() {
           </Grid>
 
           {/* Feature 2 */}
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Card
               sx={{
                 height: '100%',
@@ -217,7 +217,7 @@ export default function Home() {
           </Grid>
 
           {/* Feature 3 */}
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Card
               sx={{
                 height: '100%',
@@ -273,7 +273,7 @@ export default function Home() {
 
           <Grid container spacing={4} justifyContent="center">
             {/* Step 1 */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Box sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
@@ -303,7 +303,7 @@ export default function Home() {
             </Grid>
 
             {/* Step 2 */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Box sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
@@ -333,7 +333,7 @@ export default function Home() {
             </Grid>
 
             {/* Step 3 */}
-            <Grid item xs={12} sm={6} md={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <Box sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
