@@ -82,6 +82,7 @@ async fn main() -> std::io::Result<()> {
             .allowed_origin_fn(|_origin, _req_head| true) // 允许任何 Origin
             .allow_any_method()
             .allow_any_header()
+            .supports_credentials()
             .max_age(3600);
 
         App::new()
