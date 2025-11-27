@@ -2,7 +2,7 @@
  * API 配置
  */
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://miniapp.egtoy.xyz/backend';
+export const API_BASE_URL = 'https://miniapp.egtoy.xyz/backend';
 
 export const API_ENDPOINTS = {
   resumes: {
