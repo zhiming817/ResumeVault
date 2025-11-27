@@ -71,7 +71,7 @@ const Navbar = () => {
   };
 
   const navigation = [
-    { name: 'Home', href: '/resume' },
+    { name: 'Home', href: '/' },
     { name: 'Create Resume', href: '/resume/create' },
     { name: 'My Resumes', href: '/resume/list' },
     { name: 'Browse Resumes', href: '/resume/browse' },

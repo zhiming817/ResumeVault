@@ -20,7 +20,6 @@
     "@mui/material": "^7.3.5",
     "@mui/x-date-pickers": "^8.19.0",
     "@mysten/dapp-kit": "^0.19.9",
-    "@mysten/seal": "^0.9.4",
     "@mysten/sui": "^1.45.0",
     "@mysten/walrus": "^0.8.4",
     "@mysten/walrus-wasm": "^0.1.1",

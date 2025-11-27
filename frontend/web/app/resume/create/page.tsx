@@ -14,6 +14,10 @@ import {
   ListItemIcon,
   ListItemText,
   CircularProgress,
+  Tabs,
+  Tab,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import StarIcon from '@mui/icons-material/Star';
@@ -38,6 +42,8 @@ export default function ResumeCreate() {
   const connected = isConnected;
   const [activeSection, setActiveSection] = useState('personal');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Form data
   const [formData, setFormData] = useState<ResumeData>({
@@ -218,49 +224,87 @@ export default function ResumeCreate() {
 
   return (
     <PageLayout>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 } }}>
         {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+        <Box sx={{ mb: { xs: 2, md: 4 } }}>
+          <Typography 
+            variant="h3" 
+            component="h1" 
+            fontWeight="bold" 
+            gutterBottom
+            sx={{ fontSize: { xs: '1.75rem', md: '3rem' } }}
+          >
             Create Your Resume
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}>
             Fill in your professional information
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 3 }}>
-          {/* Sidebar */}
-          <Paper
-            sx={{
-              width: 280,
-              flexShrink: 0,
-              position: 'sticky',
-              top: 96,
-              alignSelf: 'flex-start',
-            }}
-          >
-            <List component="nav">
-              {sections.map((section) => (
-                <ListItemButton
-                  key={section.id}
-                  selected={activeSection === section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  sx={{
-                    borderRadius: 1,
-                    mx: 1,
-                    my: 0.5,
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>{section.icon}</ListItemIcon>
-                  <ListItemText primary={section.name} />
-                </ListItemButton>
-              ))}
-            </List>
-          </Paper>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: { xs: 2, md: 3 } }}>
+          {/* Sidebar - Desktop */}
+          {!isMobile && (
+            <Paper
+              sx={{
+                width: 280,
+                flexShrink: 0,
+                position: 'sticky',
+                top: 96,
+                alignSelf: 'flex-start',
+              }}
+            >
+              <List component="nav">
+                {sections.map((section) => (
+                  <ListItemButton
+                    key={section.id}
+                    selected={activeSection === section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    sx={{
+                      borderRadius: 1,
+                      mx: 1,
+                      my: 0.5,
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>{section.icon}</ListItemIcon>
+                    <ListItemText primary={section.name} />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Paper>
+          )}
+
+          {/* Tabs - Mobile */}
+          {isMobile && (
+            <Paper sx={{ mb: 2 }}>
+              <Tabs
+                value={activeSection}
+                onChange={(e, newValue) => setActiveSection(newValue)}
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{
+                  '& .MuiTab-root': {
+                    minWidth: 'auto',
+                    px: 2,
+                    textTransform: 'none',
+                  },
+                }}
+              >
+                {sections.map((section) => (
+                  <Tab
+                    key={section.id}
+                    label={section.name}
+                    value={section.id}
+                    icon={section.icon}
+                    iconPosition="start"
+                    sx={{ fontSize: '0.75rem' }}
+                  />
+                ))}
+              </Tabs>
+            </Paper>
+          )}
 
           {/* Main Content */}
-          <Paper sx={{ flex: 1, p: 4 }}>
+          <Paper sx={{ flex: 1, p: { xs: 2, md: 4 } }}>
             {activeSection === 'personal' && (
               <PersonalInfo formData={formData} handleInputChange={handleInputChange} />
             )}
@@ -327,12 +371,24 @@ export default function ResumeCreate() {
             )}
 
             {/* Action Buttons */}
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+            <Box 
+              sx={{ 
+                mt: { xs: 3, md: 4 }, 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'space-between',
+                gap: 2,
+              }}
+            >
               <Button
                 variant="outlined"
                 size="large"
                 onClick={() => router.back()}
-                sx={{ textTransform: 'none' }}
+                sx={{ 
+                  textTransform: 'none',
+                  order: { xs: 2, sm: 1 },
+                }}
+                fullWidth={isMobile}
               >
                 Cancel
               </Button>
@@ -341,8 +397,12 @@ export default function ResumeCreate() {
                 size="large"
                 onClick={handleSave}
                 disabled={isSubmitting}
-                sx={{ textTransform: 'none' }}
+                sx={{ 
+                  textTransform: 'none',
+                  order: { xs: 1, sm: 2 },
+                }}
                 startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+                fullWidth={isMobile}
               >
                 {isSubmitting ? 'Saving...' : 'Save Resume'}
               </Button>

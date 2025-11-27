@@ -142,6 +142,7 @@ export interface ResumeMetadata {
   status?: string;
   unlock_count?: number;
   view_count?: number;
+  price?: number; // 价格（单位：lamports）
 }
 
 /**

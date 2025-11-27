@@ -23,7 +23,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LockIcon from '@mui/icons-material/Lock';
 import DescriptionIcon from '@mui/icons-material/Description';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PageLayout from '@/app/components/layout/PageLayout';
+import SetPriceDialog from '@/app/components/SetPriceDialog';
 import { ResumeMetadata } from '@/app/lib/types';
 
 export default function ResumeList() {
@@ -32,6 +34,8 @@ export default function ResumeList() {
   const [resumes, setResumes] = useState<ResumeMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [priceDialogOpen, setPriceDialogOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState<ResumeMetadata | null>(null);
 
   useEffect(() => {
     if (address) {
@@ -62,18 +66,18 @@ export default function ResumeList() {
       if (data.success) {
         setResumes(data.data || []);
       } else {
-        throw new Error(data.error || '获取简历列表失败');
+        throw new Error(data.error || 'Failed to fetch resume list');
       }
     } catch (err) {
       console.error('Failed to fetch resumes:', err);
-      setError(err instanceof Error ? err.message : '加载简历列表失败');
+      setError(err instanceof Error ? err.message : 'Failed to load resume list');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('确定要删除这份简历吗？')) {
+    if (!confirm('Are you sure you want to delete this resume?')) {
       return;
     }
 
@@ -88,10 +92,10 @@ export default function ResumeList() {
 
       // 重新加载列表
       fetchResumes();
-      alert('简历已删除');
+      alert('Resume deleted successfully');
     } catch (err) {
       console.error('Failed to delete resume:', err);
-      alert('删除简历失败');
+      alert('Failed to delete resume');
     }
   };
 
@@ -100,16 +104,26 @@ export default function ResumeList() {
     router.push(`/resume/view/${resume.id}`);
   };
 
+  const handleSetPrice = (resume: ResumeMetadata) => {
+    setSelectedResume(resume);
+    setPriceDialogOpen(true);
+  };
+
+  const handlePriceSuccess = () => {
+    // 刷新列表
+    fetchResumes();
+  };
+
   const formatDate = (dateString?: string) => {
-    if (!dateString) return '未知';
+    if (!dateString) return 'Unknown';
     try {
-      return new Date(dateString).toLocaleDateString('zh-CN', {
+      return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
     } catch {
-      return '未知';
+      return 'Unknown';
     }
   };
 
@@ -120,7 +134,7 @@ export default function ResumeList() {
           <Card sx={{ textAlign: 'center', py: 8 }}>
             <CardContent>
               <Typography variant="h5" color="text.secondary">
-                请先连接钱包
+                Please connect your wallet first
               </Typography>
             </CardContent>
           </Card>
@@ -136,10 +150,10 @@ export default function ResumeList() {
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box>
             <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
-              我的简历
+              My Resumes
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              管理您保存的所有简历
+              Manage all your saved resumes
             </Typography>
           </Box>
           <Button
@@ -149,7 +163,7 @@ export default function ResumeList() {
             onClick={() => router.push('/resume/create')}
             sx={{ textTransform: 'none' }}
           >
-            创建新简历
+            Create New Resume
           </Button>
         </Box>
 
@@ -159,7 +173,7 @@ export default function ResumeList() {
             <CardContent>
               <CircularProgress size={48} />
               <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
-                加载中...
+                Loading...
               </Typography>
             </CardContent>
           </Card>
@@ -170,7 +184,7 @@ export default function ResumeList() {
                 {error}
               </Alert>
               <Button variant="contained" onClick={fetchResumes}>
-                重试
+                Retry
               </Button>
             </CardContent>
           </Card>
@@ -179,7 +193,7 @@ export default function ResumeList() {
             <CardContent>
               <DescriptionIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
               <Typography variant="h5" color="text.secondary" gutterBottom>
-                还没有简历
+                No resumes yet
               </Typography>
               <Button
                 variant="contained"
@@ -187,7 +201,7 @@ export default function ResumeList() {
                 onClick={() => router.push('/resume/create')}
                 sx={{ mt: 2, textTransform: 'none' }}
               >
-                创建第一份简历
+                Create Your First Resume
               </Button>
             </CardContent>
           </Card>
@@ -221,12 +235,12 @@ export default function ResumeList() {
                     {/* Header */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 2 }}>
                       <Typography variant="h6" component="h3" fontWeight="bold" sx={{ flex: 1 }}>
-                        {resume.title || resume.name || '未命名简历'}
+                        {resume.title || resume.name || 'Untitled Resume'}
                       </Typography>
                       {resume.encrypted && (
                         <Chip
                           icon={<LockIcon />}
-                          label="加密"
+                          label="Encrypted"
                           size="small"
                           color="success"
                           sx={{ ml: 1 }}
@@ -246,16 +260,16 @@ export default function ResumeList() {
                         overflow: 'hidden',
                       }}
                     >
-                      {resume.summary || '暂无简介'}
+                      {resume.summary || 'No summary'}
                     </Typography>
 
                     {/* Meta */}
                     <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
                       <Typography variant="caption" display="block">
-                        创建时间: {formatDate(resume.created_at || resume.createdAt)}
+                        Created: {formatDate(resume.created_at || resume.createdAt)}
                       </Typography>
                       <Typography variant="caption" display="block">
-                        更新时间: {formatDate(resume.updated_at || resume.updatedAt)}
+                        Updated: {formatDate(resume.updated_at || resume.updatedAt)}
                       </Typography>
                       {(resume.blob_id || resume.blobId) && (
                         <Tooltip title={resume.blob_id || resume.blobId}>
@@ -283,8 +297,22 @@ export default function ResumeList() {
                       onClick={() => handleView(resume)}
                       sx={{ flex: 1, mr: 1, textTransform: 'none' }}
                     >
-                      查看
+                      View
                     </Button>
+                    <Tooltip title="Set Price">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleSetPrice(resume)}
+                        sx={{
+                          border: 1,
+                          borderColor: 'primary.main',
+                          mr: 1,
+                          '&:hover': { bgcolor: 'primary.main', color: 'white' },
+                        }}
+                      >
+                        <AttachMoneyIcon />
+                      </IconButton>
+                    </Tooltip>
                     <IconButton
                       color="error"
                       onClick={() => handleDelete(resume.id)}
@@ -300,6 +328,19 @@ export default function ResumeList() {
                 </Card>
             ))}
           </Box>
+        )}
+
+        {/* Set Price Dialog */}
+        {selectedResume && (
+          <SetPriceDialog
+            open={priceDialogOpen}
+            onClose={() => setPriceDialogOpen(false)}
+            resumeId={selectedResume.id}
+            resumeName={selectedResume.title || selectedResume.name || 'Untitled Resume'}
+            owner={address || ''}
+            currentPrice={selectedResume.price || 0}
+            onSuccess={handlePriceSuccess}
+          />
         )}
       </Container>
     </PageLayout>
