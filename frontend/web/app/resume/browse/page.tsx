@@ -57,7 +57,7 @@ export default function BrowseResumes() {
     setError(null);
 
     try {
-      const apiResponse = await fetch(`https://miniapp.egtoy.xyz/backend/api/resumes/summaries`);
+      const apiResponse = await fetch(`${API_BASE_URL}/api/resumes/summaries`);
       if (!apiResponse.ok) {
         throw new Error('Failed to fetch resumes');
       }
