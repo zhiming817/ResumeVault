@@ -18,7 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DownloadIcon from '@mui/icons-material/Download';
 import LockIcon from '@mui/icons-material/Lock';
 import PageLayout from '@/app/components/layout/PageLayout';
-import { ResumeMetadata, ResumeData } from '@/app/lib/types';
+import { API_BASE_URL } from '@/app/lib/config/api.config';
 import { useAccount } from 'wagmi';
 
 interface PageProps {
@@ -62,8 +62,7 @@ export default function ResumeView({ params }: PageProps) {
     setError(null);
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://miniapp.egtoy.xyz/backend';
-      const response = await fetch(`${apiBaseUrl}/api/resumes/${id}/${address}`);
+      const response = await fetch(`${API_BASE_URL}/api/resumes/${id}/${address}`);
       if (!response.ok) {
         throw new Error('Resume not found');
       }

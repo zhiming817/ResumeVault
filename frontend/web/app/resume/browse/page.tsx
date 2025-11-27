@@ -25,7 +25,7 @@ import {
   Person as PersonIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
-import { httpClient } from '@/app/lib/services/http.client';
+import { API_BASE_URL } from '@/app/lib/config/api.config';
 import PageLayout from '@/app/components/layout/PageLayout';
 
 interface ResumeSummary {
@@ -57,18 +57,15 @@ export default function BrowseResumes() {
     setError(null);
 
     try {
-      const response = await httpClient.get<{ success: boolean; data: ResumeSummary[] }>(
-        '/api/resumes/summaries'
-      );
+      const apiResponse = await fetch(`${API_BASE_URL}/api/resumes/summaries`);
+      if (!apiResponse.ok) {
+        throw new Error('Failed to fetch resumes');
+      }
+      const response = await apiResponse.json();
 
       if (response.success && response.data) {
         // 后端返回的数据结构是 { success: true, data: [...] }
-        // httpClient 将整个响应体作为 data 返回
-        const backendResponse = response.data as any;
-        if (backendResponse.success && Array.isArray(backendResponse.data)) {
-          setResumes(backendResponse.data);
-        } else if (Array.isArray(response.data)) {
-          // 如果 response.data 本身就是数组
+        if (Array.isArray(response.data)) {
           setResumes(response.data);
         } else {
           throw new Error('Invalid response format');

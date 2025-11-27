@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '@/app/lib/config/api.config';
 import {
   Dialog,
   DialogTitle,
@@ -63,8 +64,7 @@ export default function SetPriceDialog({
       // Convert SOL to lamports (1 SOL = 1,000,000,000 lamports)
       const priceInLamports = Math.floor(priceNum * 1_000_000_000);
 
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://miniapp.egtoy.xyz/backend';
-      const response = await fetch(`${apiBaseUrl}/api/resumes/price`, {
+      const response = await fetch(`${API_BASE_URL}/api/resumes/price`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

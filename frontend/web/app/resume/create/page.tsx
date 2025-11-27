@@ -34,6 +34,7 @@ import WorkExperience from '@/app/components/resume/WorkExperience';
 import Education from '@/app/components/resume/Education';
 import ProjectExperience from '@/app/components/resume/ProjectExperience';
 import Certificates from '@/app/components/resume/Certificates';
+import { API_BASE_URL } from '@/app/lib/config/api.config';
 import { ResumeData } from '@/app/lib/types';
 
 export default function ResumeCreate() {
@@ -122,8 +123,7 @@ export default function ResumeCreate() {
       console.log('📋 Data:', formData);
 
       // 直接调用后端 API 保存简历
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const apiResponse = await fetch(`${apiBaseUrl}/api/resumes`, {
+      const apiResponse = await fetch(`${API_BASE_URL}/api/resumes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

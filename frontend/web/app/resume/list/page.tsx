@@ -26,6 +26,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import PageLayout from '@/app/components/layout/PageLayout';
 import SetPriceDialog from '@/app/components/SetPriceDialog';
+import { API_BASE_URL } from '@/app/lib/config/api.config';
 import { ResumeMetadata } from '@/app/lib/types';
 
 export default function ResumeList() {
@@ -53,8 +54,7 @@ export default function ResumeList() {
     setError(null);
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
-      const response = await fetch(`${apiBaseUrl}/api/resumes/my/${address}`);
+      const response = await fetch(`${API_BASE_URL}/api/resumes/my/${address}`);
       if (!response.ok) {
         throw new Error('Failed to fetch resumes');
       }
